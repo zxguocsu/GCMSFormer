@@ -3,7 +3,7 @@
 This is the code repo for GCMSFormer mehtod. We proposed the GCMSFormer for resolving the overlapped peaks in complex GC-MS data based on a Transformer model. The GCMSFormer model was trained, validated, and tested with 30,000 augmented simulated overlapped peaks in a ratio of 8:1:1, and its bilingual evaluation understudy (BLEU) on the test set was 0.985. With the aid of the orthogonal projection resolution method (OPR), GCMSFormer can predict the pure mass spectra of all components in overlapped peaks (mass spectral matrix S), and then use the least squares method to find the concentration distribution matrix C. The automatic resolution of the overlapped peaks can be easily achieved. 
 
 <div align="center">
-<img src="https://github.com/zmzhang/GCMSFormer/blob/main/workflow.png" width=809 height=970 />
+<img src="https://github.com/zmzhang/GCMSFormer/blob/main/workflow.png" width=800 height=970 />
 </div>
 
 
