@@ -1,4 +1,4 @@
-name: pytorch
+name: GCMSFormer
 channels:
   - pytorch
   - defaults
@@ -261,4 +261,4 @@ dependencies:
     - widgetsnbextension==4.0.3
     - wrapt==1.14.1
     - zipp==3.10.0
-prefix: D:\Anaconda3\envs\pytorch
+prefix: D:\Anaconda3\envs\GCMSFormer
