@@ -6,7 +6,9 @@ simulated overlapped peaks in a ratio of 8:1:1, and its bilingual evaluation und
 With the aid of the orthogonal projection resolution method (OPR), GCMSFormer can predict the pure mass spectra of all 
 components in overlapped peaks (mass spectral matrix S), and then use the least squares method to find the concentration 
 distribution matrix C. The automatic resolution of the overlapped peaks can be easily achieved.
+
 ![](https://github.com/Xuaner111/GCMSFormer/blob/master/workflow.png)
+
 ### Package required:
 We recommend to use [conda](https://conda.io/docs/user-guide/install/download.html) and [pip](https://pypi.org/project/pip/).
 - [python3](https://www.python.org/)
