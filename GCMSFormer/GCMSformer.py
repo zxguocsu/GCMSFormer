@@ -113,11 +113,13 @@ def data_gen(src, tgt, batch_size, tgt_inds, d_models, device):
 
 class Embeddings(nn.Module):
     def __init__(self, d_model):
+        # vocab:指词表大小
         super(Embeddings, self).__init__()
+        self.lut = nn.Linear(d_model, d_model)
         self.d_model = d_model
 
     def forward(self, x):
-        return x * math.sqrt(self.d_model)
+        return self.lut(x) * math.sqrt(self.d_model)
 
 class PositionalEncoding(nn.Module):
     "Implement the PE function."

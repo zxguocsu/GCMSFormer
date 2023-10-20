@@ -1,6 +1,6 @@
 ## GCMSFormer
 
-This is the code repo for GCMSFormer mehtod. We proposed the GCMSFormer for resolving the overlapped peaks in complex GC-MS data based on a Transformer model. The GCMSFormer model was trained, validated, and tested with 100,000 augmented simulated overlapped peaks in a ratio of 8:1:1, and its bilingual evaluation understudy (BLEU) on the test set was 0.99722. With the aid of the orthogonal projection resolution method (OPR), GCMSFormer can predict the pure mass spectra of all components in overlapped peaks (mass spectral matrix S), and then use the least squares method to find the concentration distribution matrix C. The automatic resolution of the overlapped peaks can be easily achieved.
+This is the code repo for GCMSFormer mehtod. We proposed the GCMSFormer for resolving the overlapped peaks in complex GC-MS data based on a Transformer model. The GCMSFormer model was trained, validated, and tested with 100,000 augmented simulated overlapped peaks in a ratio of 8:1:1, and its bilingual evaluation understudy (BLEU) on the test set was 0.99876. With the aid of the orthogonal projection resolution method (OPR), GCMSFormer can predict the pure mass spectra of all components in overlapped peaks (mass spectral matrix S), and then use the least squares method to find the concentration distribution matrix C. The automatic resolution of the overlapped peaks can be easily achieved.
 
 ![](https://github.com/zxguocsu/GCMSFormer/blob/master/workflow.png)
 
@@ -26,7 +26,7 @@ The overlapped peak dataset for training, validating and testing the GCMSFormer 
 - para : Data augmentation parameters 
 
 ## Model training
-Train the model based on your own training dataset with [train_model](https://github.com/zxguocsu/GCMSFormer/blob/master/GCMSFormer/GCMSformer.py#L408) function.
+Train the model based on your own training dataset with [train_model](https://github.com/zxguocsu/GCMSFormer/blob/master/GCMSFormer/GCMSformer.py#L410) function.
 
     model, Loss = train_model(para, TRAIN, VALID, tgt_vacob)
 
@@ -52,7 +52,7 @@ Automatic Resolution of GC-MS data files by using the [Resolution](https://githu
 ## Clone the repository and run it directly
 [git clone](https://github.com/zxguocsu/GCMSFormer)
 
-An example has been provided in [test.ipynb](https://github.com/zxguocsu/GCMSFormer/blob/master/test_new.ipynb) 
+An example has been provided in [test.ipynb](https://github.com/zxguocsu/GCMSFormer/blob/master/test.ipynb) 
 script for the convenience of users. The GC-MS file used in it is available in the file [Essential Oil Data](https://github.com/zxguocsu/GCMSFormer/releases/tag/v1.0.0).
 
 ## Contact

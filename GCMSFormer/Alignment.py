@@ -159,7 +159,7 @@ def Alignment(path,files, model,tgt_vacob,device):
     rrs0 = []
 
     for i in range(len(areas)):
-        if len(areas[i]) >= 0:
+        if len(areas[i]) >= 5:
             areas0.append(areas[i])
             rrs0.append(rrs[i])
             trs0.append(tr3[i])
