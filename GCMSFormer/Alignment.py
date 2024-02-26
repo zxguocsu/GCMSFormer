@@ -7,7 +7,7 @@ from .Resolution import Resolution, output_msp
 import warnings
 warnings.filterwarnings("ignore")
 
-def Alignment(path,files, model,tgt_vacob,device):
+def Alignment(path, files, model, tgt_vocab, device):
 
     global a
     T = []
@@ -18,7 +18,7 @@ def Alignment(path,files, model,tgt_vacob,device):
 
     for filename in files:
 
-        sta_S, area, rt, R2 =  Resolution(path,filename,model,tgt_vacob,device)
+        sta_S, area, rt, R2 =  Resolution(path, filename, model, tgt_vocab, device)
 
         msp = filename.split('.CDF')[0] + '.MSP'
         output_msp(path + '/' + msp, sta_S, rt)
@@ -190,6 +190,6 @@ def Alignment(path,files, model,tgt_vacob,device):
         max_m.append(np.argmax(S_list[trs1[i][0]])+1)
 
     df = pd.DataFrame({'rt': trs0, 'max.m/z': max_m})
-    for i in range(V.shape[-1]):  # V.shape[-1]是求V矩阵的列数 = 文件数
+    for i in range(V.shape[-1]):
        df.insert(loc=len(df.columns), column=files[i], value=V[:,i])
     return df, N

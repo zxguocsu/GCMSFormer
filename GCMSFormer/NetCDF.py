@@ -1,11 +1,5 @@
-'''
-
-
-
-'''
 
 from scipy.io import netcdf_file
-# import scipy.io.netcdf as nc
 from scipy.sparse import coo_matrix
 from numpy import zeros, hstack, linspace
 import numpy as np
@@ -16,13 +10,12 @@ from matplotlib.pyplot import MultipleLocator
 
 
 class netcdf_reader:
-    def __init__(self, filename, bmmap=True):  # 传入文件路径
-        # 取出GCMS中所有参数的数据值
+    def __init__(self, filename, bmmap=True):
+
         self.filename = filename
-        # self.f = nc.netcdf_file(filename, 'r', mmap=bmmap)
-        self.f = netcdf_file(filename, 'r', mmap=bmmap)  # 读取创建的CDF文件
-        self.mass_values = self.f.variables['mass_values']  # 将CDF文件中的质荷比值赋值给mass_values
-        self.intensity_values = self.f.variables['intensity_values']  # 将CDF文件中的强度值赋值给intensity_values
+        self.f = netcdf_file(filename, 'r', mmap=bmmap)
+        self.mass_values = self.f.variables['mass_values']
+        self.intensity_values = self.f.variables['intensity_values']
         self.scan_index = self.f.variables['scan_index']
         self.total_intensity = self.f.variables['total_intensity']
         self.scan_acquisition_time = self.f.variables['scan_acquisition_time']
@@ -31,7 +24,7 @@ class netcdf_reader:
 
     def mz(self, n):
 
-        # np.hstack 水平（按列）顺序连接两个数组 ——> 相当于按列拼接n个矩阵然后进行转置
+
         scan_index_end = hstack((self.scan_index.data, np.array([len(self.intensity_values.data)], dtype=int)))
         ms = {}
         inds = range(scan_index_end[n], scan_index_end[n + 1])
@@ -56,7 +49,7 @@ class netcdf_reader:
         rt = self.tic()['rt'][indmin:indmax + 1]
         return rt
 
-    def tic(self):  # 导出保留时间和强度
+    def tic(self):
         nsize = len(self.total_intensity.data)
         tic = {}
         tic['rt'] = self.scan_acquisition_time.data / 60.0
@@ -92,7 +85,7 @@ class netcdf_reader:
                 mo[i, j - imin, 0:(inds[i + 1] - inds[i])] = ms[inds[i]:inds[i + 1]]
         return np.sum(mo, 2)
 
-# 画ms图
+
 def plot_ms(ms):
     fig = figure()
     ax = fig.add_subplot(111)
@@ -100,7 +93,7 @@ def plot_ms(ms):
     ax.xaxis.set_major_formatter(FormatStrFormatter('%3.0f'))
     show()
 
-# 画tic图
+
 def plot_tic(tic):
     fig = plt.figure(figsize=(10, 6))
     ax = fig.add_subplot(111)

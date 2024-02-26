@@ -3,7 +3,7 @@ import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import numpy as np
 import random
-from tqdm import tqdm  # 进度条库
+from tqdm import tqdm
 from scipy import stats
 import torch
 import json
@@ -148,7 +148,7 @@ def read_msp_MZmine(msp_file_path):
             n.append(i)
     mss = np.zeros((0, 1000), dtype=np.float64)
     for t in range(len(m) - 1):
-        mzs = []  #
+        mzs = []
         ins = []
         for j in range(n[t] + 1, m[t + 1] - 1):
             ps = a[j].split('\n ')
@@ -246,7 +246,7 @@ def data_augmentation_added(mss, d_models, n, noise_level = 0.001):
     ms = np.zeros_like(mss)
     for i in range(len(mss)):
         ms[i] = mss[i] / np.sum(mss[i])
-    tgt_vacob = torch.tensor(ms, dtype=torch.float)
+    tgt_vocab = torch.tensor(ms, dtype=torch.float)
 
     bos = torch.cat((torch.ones([1, int(d_models / 2)], dtype=torch.float),
                      torch.zeros([1, int(d_models / 2)], dtype=torch.float)), dim=1)
@@ -256,22 +256,22 @@ def data_augmentation_added(mss, d_models, n, noise_level = 0.001):
 
     pad = torch.zeros([1, d_models], dtype=torch.float)
 
-    tgt_vacob = torch.cat((pad, bos, eos, tgt_vacob), dim=0)
+    tgt_vocab = torch.cat((pad, bos, eos, tgt_vocab), dim=0)
 
     TARGET_ind = []
     for t in TARGET_rnd:
         ind = []
         for i in range(len(t)):
-            for j in range(len(tgt_vacob)):
-                if t[i].equal(tgt_vacob[j]):
+            for j in range(len(tgt_vocab)):
+                if t[i].equal(tgt_vocab[j]):
                     ind.append(j)
         TARGET_ind.append(torch.tensor(ind))
 
-    return DATA_rnd, TARGET_rnd, tgt_vacob, TARGET_ind, TOTAL_rnd
+    return DATA_rnd, TARGET_rnd, tgt_vocab, TARGET_ind, TOTAL_rnd
 
 def data_split(aug_num, d_models, mss, validation_split):
 
-    DATA, TARGET, tgt_vacob, TARGET_ind, TOTAL = data_augmentation_added(mss, d_models, aug_num, noise_level=0.001)
+    DATA, TARGET, tgt_vocab, TARGET_ind, TOTAL = data_augmentation_added(mss, d_models, aug_num, noise_level=0.001)
 
     train_src = DATA[0:round((1 - validation_split) * aug_num)]
     train_tgt = TARGET[0:round((1 - validation_split) * aug_num)]
@@ -290,15 +290,15 @@ def data_split(aug_num, d_models, mss, validation_split):
     test_tgt_ind = TARGET_ind[round(0.9 * aug_num):aug_num]
     test_total = TOTAL[round(0.9 * aug_num):aug_num]
     TEST = tuple((test_src, test_tgt, test_tgt_ind, test_total))
-    return TRAIN, VALID, TEST, tgt_vacob
+    return TRAIN, VALID, TEST, tgt_vocab
 
 def gen_datasets(para, mss, new_vocab_name = None):
     aug_nums = para['aug_num']
     validation_split = 0.2
     d_models = int(max(para['mz_range']))
-    TRAIN, VALID, TEST, tgt_vacob = data_split(aug_nums, d_models, mss, validation_split)
+    TRAIN, VALID, TEST, tgt_vocab = data_split(aug_nums, d_models, mss, validation_split)
     if new_vocab_name:
         with open(f'{new_vocab_name}' + '.pk', 'wb') as file:
-            pickle.dump(tgt_vacob, file)
+            pickle.dump(tgt_vocab, file)
 
-    return TRAIN, VALID, TEST, tgt_vacob
+    return TRAIN, VALID, TEST, tgt_vocab

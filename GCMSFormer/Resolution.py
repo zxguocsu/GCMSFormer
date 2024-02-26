@@ -48,7 +48,7 @@ def back_remove(xx, point, range_point):
     bias = xx - bak
     return bak, bias
 
-def Resolution(path, filename, model, tgt_vacob, device):
+def Resolution(path, filename, model, tgt_vocab, device):
     ncr = netcdf_reader(path + '/' + filename, True)
     m = np.array(ncr.mat(0, len(ncr.tic()['rt']) - 1).T, dtype='float32')
     ms = np.array(ncr.mz_rt(10)['mz'], dtype='int')
@@ -135,7 +135,7 @@ def Resolution(path, filename, model, tgt_vacob, device):
 
         rt = ncr.tic()['rt']
         X0 = torch.from_numpy(X0).float()
-        pred_tgt_ind = predict(model, X0, tgt_vacob, device, d_model=1000, max_len=7)
+        pred_tgt_ind = predict(model, X0, tgt_vocab, device, d_model=1000, max_len=7)
         pred_tgt_ind = sorted(set(pred_tgt_ind.tolist()), key=pred_tgt_ind.tolist().index)
 
         if len(pred_tgt_ind) > len(new_num):
@@ -143,7 +143,7 @@ def Resolution(path, filename, model, tgt_vacob, device):
             t0 = np.arange(ls[j][0] + 4, ls[j][-1] + 1)
             X0, xX0 = converts(m0)
             X0 = torch.from_numpy(X0).float()
-            pred_tgt_ind = predict(model, X0, tgt_vacob, device, d_model=1000, max_len=7)
+            pred_tgt_ind = predict(model, X0, tgt_vocab, device, d_model=1000, max_len=7)
             pred_tgt_ind = sorted(set(pred_tgt_ind.tolist()), key=pred_tgt_ind.tolist().index)
 
         if len(pred_tgt_ind) == len(new_num):
@@ -177,7 +177,7 @@ def Resolution(path, filename, model, tgt_vacob, device):
                     X_opr = np.zeros_like(X_0)
                     P = np.zeros((1000, len(k)), dtype=np.float32)
                     for i, n in enumerate(k):
-                        P[:, i] = tgt_vacob[n].numpy()
+                        P[:, i] = tgt_vocab[n].numpy()
                     u, s0, v = np.linalg.svd(P.T)
                     I = np.identity(1000, dtype=np.float32)
                     Mk = I - np.dot(v[0:len(k)].T, (v[0:len(k)]))
@@ -189,12 +189,12 @@ def Resolution(path, filename, model, tgt_vacob, device):
                     X_opr[X_opr < 0] = 0
                     X_1 = X_opr / np.max(X_opr)
                     X_opr0 = torch.from_numpy(X_1).float()
-                    pred_tgt_ind0 = predict(model, X_opr0, tgt_vacob, device, d_model=1000, max_len=7)
+                    pred_tgt_ind0 = predict(model, X_opr0, tgt_vocab, device, d_model=1000, max_len=7)
                     pred_tgt_ind0 = sorted(set(pred_tgt_ind0.tolist()), key=pred_tgt_ind0.tolist().index)
                     if pred_tgt_ind0 == pred_tgt_ind1:
                         ind_x = list(np.where(np.sum(X_1, 1) / max(np.sum(X_1, 1)) < 0.08)[0])
-                        X_opr0[ind_x] = 0  # 将投影矩阵里面得分小于0.08的置为0
-                        pred_tgt_ind0 = predict(model, X_opr0, tgt_vacob, device, d_model=1000, max_len=7)
+                        X_opr0[ind_x] = 0
+                        pred_tgt_ind0 = predict(model, X_opr0, tgt_vocab, device, d_model=1000, max_len=7)
                         pred_tgt_ind0 = sorted(set(pred_tgt_ind0.tolist()), key=pred_tgt_ind0.tolist().index)
 
                     pred_tgt_ind1 = pred_tgt_ind1 + pred_tgt_ind0
@@ -214,7 +214,7 @@ def Resolution(path, filename, model, tgt_vacob, device):
         pred_tgt_ind_list.append(pred_tgt_ind)
 
         for i in range(len(pred_tgt_ind)):
-            S[i] = (tgt_vacob[pred_tgt_ind[i]].cpu()).numpy()
+            S[i] = (tgt_vocab[pred_tgt_ind[i]].cpu()).numpy()
 
         for i in range(0, 200):
             S[S < 0] = 0

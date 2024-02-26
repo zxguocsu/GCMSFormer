@@ -113,7 +113,6 @@ def data_gen(src, tgt, batch_size, tgt_inds, d_models, device):
 
 class Embeddings(nn.Module):
     def __init__(self, d_model):
-        # vocab:指词表大小
         super(Embeddings, self).__init__()
         self.lut = nn.Linear(d_model, d_model)
         self.d_model = d_model
@@ -138,7 +137,6 @@ class PositionalEncoding(nn.Module):
         pe = pe.unsqueeze(0)
         self.register_buffer('pe', pe)
 
-    # 将位置编码数据直接与原数据相加
     def forward(self, x):
         x = x + Variable(self.pe[:, :x.size(1)], requires_grad=False)
         return self.dropout(x)
@@ -407,11 +405,11 @@ def evaluate(data_iter, eval_model, loss_compute):
             del loss
     return total_loss / i
 
-def train_model(para, TRAIN, VALID, tgt_vacob):
+def train_model(para, TRAIN, VALID, tgt_vocab):
 
     # load Datasets
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    tgt_vacob = tgt_vacob.to(device)
+    tgt_vocab = tgt_vocab.to(device)
     d_models = int(max(para['mz_range']))
     train_src, train_tgt, train_tgt_ind, train_total = TRAIN
     valid_src, valid_tgt, valid_tgt_ind, valid_total = VALID
@@ -419,7 +417,7 @@ def train_model(para, TRAIN, VALID, tgt_vacob):
     best_model = None
 
     # Initialization model
-    model = make_model(tgt_vacob, N=para['layer_num'], h=para['head']).to(device)
+    model = make_model(tgt_vocab, N=para['layer_num'], h=para['head']).to(device)
 
     # loss function
     criterion = nn.CrossEntropyLoss()
@@ -491,7 +489,7 @@ def plot_loss(loss):
 
     plt.show()
 
-def greedy_decode(model, src, src_mask, tgt_vacob, device, d_model, max_len):
+def greedy_decode(model, src, src_mask, tgt_vocab, device, d_model, max_len):
     memory = model.encode(src, src_mask)
     ys = torch.cat((torch.ones([1, int(d_model / 2)], dtype=torch.float),
                     torch.zeros([1, int(d_model / 2)], dtype=torch.float)), dim=1).type_as(src.data).unsqueeze(0)
@@ -500,11 +498,11 @@ def greedy_decode(model, src, src_mask, tgt_vacob, device, d_model, max_len):
         out = model.decode(memory, src_mask, Variable(ys), Variable(subsequent_mask(ys.size(1)) .type_as(src.data)))
         prob = model.generator(out[:, -1])
         _, next_word = torch.max(prob, dim=1)
-        ys = torch.cat([ys, tgt_vacob[next_word.item()].contiguous().view(1, 1, d_model).type_as(src.data)], dim=1)
+        ys = torch.cat([ys, tgt_vocab[next_word.item()].contiguous().view(1, 1, d_model).type_as(src.data)], dim=1)
         ys_ind = torch.cat([ys_ind, next_word], dim=0)
     return ys.squeeze(), ys_ind
 
-def predict(best_model, src, tgt_vacob, device, d_model, max_len):
+def predict(best_model, src, tgt_vocab, device, d_model, max_len):
     best_model.eval()
     src = src.unsqueeze(0).to(device)
     pad = torch.zeros([d_model], dtype=torch.float).to(device)
@@ -516,7 +514,7 @@ def predict(best_model, src, tgt_vacob, device, d_model, max_len):
             else:
                 src_mask[i][j] = True
     src_mask = src_mask.unsqueeze(-2)
-    pred_tgt, pred_tgt_ind = greedy_decode(best_model, src, src_mask, tgt_vacob, device, d_model, max_len)
+    pred_tgt, pred_tgt_ind = greedy_decode(best_model, src, src_mask, tgt_vocab, device, d_model, max_len)
     pred_mask = torch.ones([len(pred_tgt_ind)], dtype=torch.bool).to(device)
 
     for i in range(len(pred_tgt_ind)):
@@ -559,12 +557,12 @@ def bleu_new(pred_seq, label_seq, k):
             score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
 
-def evaluate_model(model, TEST, tgt_vacob, d_model):
+def evaluate_model(model, TEST, tgt_vocab, d_model):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     test_src, test_tgt, test_tgt_ind, test_total = TEST
     scores = []
     for src, tgt, tgt_ind in zip(test_src, test_tgt, test_tgt_ind):
-        pred_tgt_ind = predict(model, src, tgt_vacob, device, d_model, 7)
+        pred_tgt_ind = predict(model, src, tgt_vocab, device, d_model, 7)
         k = min(2, len(pred_tgt_ind))
         tgt = tgt.to(device)
         score = bleu_new(pred_tgt_ind, tgt_ind.to(device), k)
