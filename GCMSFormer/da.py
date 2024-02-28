@@ -3,6 +3,8 @@ import random
 from tqdm import tqdm
 from scipy import stats
 import torch
+import pickle
+
 
 def data_pre(mss, max_mz, maxn, noise):
     "A sample data: R"
@@ -128,6 +130,72 @@ def data_pre(mss, max_mz, maxn, noise):
     X = np.float32((np.dot(C, S.T) + E) / np.max(np.dot(C, S.T) + E))
     total = ratios + means + [sigmas, a, b, nums, maxn]
     return X, X_0, S, ids4p, total
+
+
+def update_lib(lib_path_pk, added_path_msp, new_lib_path_pk=None):
+
+    with open(lib_path_pk, 'rb') as file:
+        lib_dic = pickle.load(file)
+
+    with open(added_path_msp, 'r') as file1:
+        f1 = file1.read()
+
+    file.close()
+    file1.close()
+
+    a = f1.split('\n')
+    m = []
+    n = []
+    for i, l in enumerate(a):
+        if l.startswith('Name'):
+            m.append(i)
+        if l.startswith('Num Peaks'):
+            n.append(i)
+    for t in range(len(m) - 1):
+        mzs = []
+        ins = []
+        for j in range(n[t] + 1, m[t + 1] - 1):
+            ps = a[j].split('\n ')
+            ps = [p for p in ps if len(p) > 0]  #
+            for p in ps:
+                mz_in = p.split(' ')
+                mzs.append(int(float(mz_in[0])))
+                ins.append(np.float32((mz_in[1])))
+        ms_added_dic = {'m/z': mzs, 'intensity': ins}
+        ms_dic = {'ms': ms_added_dic}
+        name = a[m[t]].split(':')[1].strip()
+        lib_dic.update({f'{name}': ms_dic})
+
+    mzs = []
+    ins = []
+    for j in range(n[-1] + 1, len(a)):
+        ps = a[j].split('\n ')
+        ps = [p for p in ps if len(p) > 0]  #
+        for p in ps:
+            mz_in = p.split(' ')
+            mzs.append(int(float(mz_in[0])))
+            ins.append(np.float32((mz_in[1])))
+    ms_added_dic = {'m/z': mzs, 'intensity': ins}
+    ms_dic = {'ms': ms_added_dic}
+    name = a[m[-1]].split(':')[1].strip()
+    lib_dic.update({f'{name}': ms_dic})
+    if new_lib_path_pk:
+        with open(new_lib_path_pk, "wb") as file2:
+            pickle.dump(lib_dic, file2, protocol=pickle.HIGHEST_PROTOCOL)
+        print('The new library has been successfully saved as a Pickle file')
+    file2.close()
+
+
+def add_msp_MZmine(lib_path_msp, added_path_msp):
+    with open(added_path_msp, 'r') as file1:
+        content = file1.read()
+
+    with open(lib_path_msp, 'a') as file2:
+        file2.write(content)
+
+    file1.close()
+    file2.close()
+
 
 def read_msp_MZmine(msp_file_path, d_models):
     f = open(msp_file_path).read()
