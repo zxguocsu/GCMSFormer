@@ -5,7 +5,7 @@ This is the code repo for GCMSFormer mehtod. We proposed the GCMSFormer for reso
 ![](https://github.com/zxguocsu/GCMSFormer/blob/master/workflow.jpg)
 
 ### Package required:
-We recommend to use [conda](https://conda.io/docs/user-guide/install/download.html) and [pip](https://pypi.org/project/pip/).
+We recommend to use [conda](https://conda.io/docs/user-guide/install/download.html).
 - [python3](https://www.python.org/)
 - [pytorch](https://pytorch.org/) 
 
