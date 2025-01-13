@@ -9,7 +9,7 @@ We recommend to use [conda](https://conda.io/docs/user-guide/install/download.ht
 - [python3](https://www.python.org/)
 - [pytorch](https://pytorch.org/) 
 
-By using the [`environment.yml`](https://github.com/zxguocsu/GCMSFormer/blob/master/environment.yml), [`requirements.txt`](https://github.com/zxguocsu/GCMSFormer/blob/master/requirements.txt) file, it will install all the required packages.
+By using the [`environment.yml`](https://github.com/zxguocsu/GCMSFormer/blob/master/environment.yml) file, it will install all the required packages.
 
     git clone https://github.com/zxguocsu/GCMSFormer.git
     cd GCMSFormer
